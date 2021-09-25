@@ -25,15 +25,6 @@ export class Affair {
         this.date = d;
     }
 
-    public addMemberToAffair(m: Member){
-        if(this.membersAttending.indexOf(m) == -1 && (m != null)) { //Checks if member is not in affair
-            this.membersAttending.push(m);
-            return true;
-        }
-        else
-            return false;
-    }
-
     public getMembersInvolved(){
         var list = new Array<string>();
 

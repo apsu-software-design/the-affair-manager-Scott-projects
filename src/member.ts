@@ -8,7 +8,4 @@ export class Member {
         this.email = em;
     }
 
-    public getMemberName() {
-        return this.name;
-    }
 }

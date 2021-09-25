@@ -17,14 +17,6 @@ var Affair = /** @class */ (function () {
     Affair.prototype.setDate = function (d) {
         this.date = d;
     };
-    Affair.prototype.addMemberToAffair = function (m) {
-        if (this.membersAttending.indexOf(m) == -1 && (m != null)) { //Checks if member is not in affair
-            this.membersAttending.push(m);
-            return true;
-        }
-        else
-            return false;
-    };
     Affair.prototype.getMembersInvolved = function () {
         var list = new Array();
         this.membersAttending.forEach(function (x) {
