@@ -1,12 +1,15 @@
-//your code goes here!
+import { stringify } from "querystring";
+import { listenerCount } from "stream";
+
+import { Member } from "./member";
+import { Affair } from "./affair";
+import { Organization } from "./organization";
+
 export class AffairManager {
 
-    private member: Member;
-    private organization:Organization;
-    private affair: Affair;
-    private affairList: string[];
+    private affairList: Affair[];
     private organizationList: Organization[];
-    private memberList: string[];
+    private memberList: Member[];
 
     public constructor() {
         this.affairList = new Array();
@@ -15,87 +18,90 @@ export class AffairManager {
     }
 
     public addMember(e: string, em: string): void {
-         this.member = new Member(e, em);
-         this.memberList.push(this.member.name, this.member.email);
-
+        this.memberList.push(new Member(e, em));
     }
 
-    public addAffair(affairName: string, zipCode: string, date: string/*,member?: Member*/) {
-        this.affair = new Affair(affairName, zipCode, date);
-        this.affairList.push(this.affair.name, this.affair.zipCode, this.affair.date);
+    public addAffair(affairName: string, zipCode: string, date: string) {
+        this.affairList.push(new Affair(affairName, zipCode, date));
     }
 
     public addOrganization(organizationName: string) {
-        this.organization = new Organization(organizationName);
-        this.organizationList.push(this.organization); //Adds organization to list
+        this.organizationList.push(new Organization(organizationName));
     }
 
-    public addMemberToAffair(e: string, affairName: string) {
+    public addMemberToAffair(member: string, affairName: string) {
+        var memObj = this.findName(member, this.memberList);
+        var affObj = this.findName(affairName, this.affairList);
 
+        affObj.push(memObj);
+
+        
     }
 
     public findMemberNames(query: string): string[] {
+        var sortedList = this.memberList.filter(this.searchFunction(query)).map(function (x) {
+            return x.name + ' ' + x.email
+        });
 
-        return this.memberList;
-        //returns a list
+        return sortedList;
+
     }
 
     public findAffairNames(query: string): string[] {
+        var sortedList = this.affairList.filter(this.searchFunction(query)).map(function (x) {
+            return x.name + ' ' + x.zipCode + ' ' + x.date + ' ' + x.membersAttending
+        })
 
-        return this.affairList;
-        //returns a list
+        return sortedList;
     }
 
     public findOrganizationNames(query: string): string[] {
+        var sortedList = this.organizationList.filter(this.searchFunction(query)).map(function (x) {
+            return x.name
+        })
 
-        return
-        //return this.organizationList;
-        //returns a list
+        return sortedList;
     }
 
-    public modifyAffair(affairName:string, newTitle:any, newTime?:any){
+    public modifyAffair(affairName: string, newTitle: string, newTime?: any) { //Doesn't work
+        var affairIndex = this.affairList.findIndex(x => x.name == affairName);
+
+        this.affairList[affairIndex].setAffairName(newTitle); //Undefined
+
+        this.affairList[affairIndex].setDate(newTime); //Undefined
 
     }
 
-    public addAffairToOrganization(affairName: string, organizationName: string) {
+    public addAffairToOrganization(nameOfAffair: string, organizationName: string) {
+        var affObj = this.findName(nameOfAffair, this.affairList);
+        var orgObj = this.findName(organizationName, this.organizationList);
+
+        orgObj.push(affObj);
 
     }
 
     public getMembers(affairName: string): string[] {
+        var affObj: Affair[] = this.findName(affairName, this.affairList);
 
-        return this.memberList;
-    }
-}
+        return affObj[0].getMembersInvolved();
 
 
-class Member {
-    name: string;
-    email: string;
 
-    public constructor(n: string, em: string) {
-        this.name = n;
-        this.email = em;
-    }
-}
-
-class Organization {
-    name: string;
-
-    public constructor(n: string){
-        this.name = n;
     }
 
-}
+    //Other Functions
+    public searchFunction = (query) => (function (x) { //Filters the list based on the query
+        return x.name.toLowerCase() == query.toLowerCase()
+    });
 
-class Affair {
-    name: string;
-    zipCode: string;
-    date: string
+    public findName(name: string, arr: Array<any>) {
+        var obj: any[] = arr.filter(obj => { return obj.name == name });
 
-    public constructor(n:string, zc:string, d:string){
-        this.name = n;
-        this.zipCode = zc;
-        this.date = d;
+        return obj;
+    }
+
+    public findAffair(affairName: string){
+        return this.findName(affairName, this.affairList);
     }
 
 }
